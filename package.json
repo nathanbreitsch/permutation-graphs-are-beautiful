@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/nathanbreitsch/permutation-graphs-are-beautiful#readme",
   "dependencies": {
+    "jquery": "^2.2.3",
+    "knockout": "^3.4.0",
     "react": "^0.14.8",
     "react-dom": "^0.14.8"
   },
