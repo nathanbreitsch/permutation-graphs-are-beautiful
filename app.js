@@ -15,7 +15,7 @@ function ViewModel(){
   var modelGraphSVG = null;
   self.intersectionGraphSVG = null;
 
-  self.permutationString = ko.observable('3,2,1,7,6,5,4');
+  self.permutationString = ko.observable('7,1,3,2,5,4,6,10,9,8');
 
   self.permutation = ko.computed(function(){
 
