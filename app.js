@@ -1,3 +1,13 @@
+var TRANSITION_TIME = 750;
+
+
+var range = function(n){
+  var points = [];
+  for(var i = 0; i < n; i++){
+    points.push(i);
+  }
+  return points;
+}
 
 function ViewModel(){
   var self = this;
@@ -21,23 +31,67 @@ function ViewModel(){
     return numbers;
   });
 
-  self.modelGraphEdges = ko.computed(function(){
-    return self.permutation().map(function(d, i){
-      return [i, d];
-    });
+
+
+  self.permutation.subscribe(function(newValue, oldValue){
+    self.drawModelGraph();
   });
 
+
+
   self.drawModelGraph = function(){
+    var permutation = self.permutation();
+    permutation = permutation ? permutation : [];
+
     var width = $("#model-graph").width();
     var height = $(window).height() * 0.8;
+    var radius = 10;
+
+    var numPoints = permutation.length;
+
     self.modelGraphSVG.attr('width', width).attr('height', height);
-    self.modelGraphSVG.selectAll('.top-circle')
-                      .data([1,2,3,4])
-                      .enter()
-                      .append('circle')
-                      .attr('cx', function(d, i){return i * width / 4})
-                      .attr('cy', function(d, i){return i * height / 4})
-                      .attr('r', function(d, i){return 30});
+
+    var topCircles = self.modelGraphSVG.selectAll('.top-circle')
+                         .data(permutation);
+
+    topCircles.enter()
+      .append('circle');
+
+    topCircles.attr('cy', function(d, i){return height * 0.2})
+      .attr('class', 'top-circle')
+      .attr('r', function(d, i){return radius})
+      .transition().duration(TRANSITION_TIME)
+      .attr('cx', function(d, i){return i * width / numPoints + radius});
+
+    var bottomCircles = self.modelGraphSVG.selectAll('.bottom-circle')
+                      .data(permutation);
+
+    bottomCircles.enter()
+      .append('circle');
+
+    bottomCircles.attr('cy', function(d, i){return height * 0.8})
+      .attr('class', 'bottom-circle')
+      .attr('r', function(d, i){return radius})
+      .transition().duration(TRANSITION_TIME)
+      .attr('cx', function(d, i){return i * width / numPoints + radius});
+
+    var lines = self.modelGraphSVG.selectAll(".edge")
+                      .data(permutation);
+    lines.enter()
+      .append("line");
+
+    lines.transition().duration(TRANSITION_TIME)
+      .attr("x1", function(d, i){return i * width / numPoints + radius})
+      .attr("y1", function(d, i){return height * 0.2})
+      .attr("x2", function(d, i){return (d-1) * width / numPoints + radius})
+      .attr("y2", function(d, i){return height * 0.8})
+      .attr("stroke-width", 2)
+      .attr("class", "edge")
+      .attr("stroke", "black");
+
+      lines.exit().remove();
+      topCircles.exit().remove();
+      bottomCircles.exit().remove();
   };
 
 }
